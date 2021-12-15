@@ -147,9 +147,12 @@ let rec subst e1 e2 id = match e1 with
    out : true iff e is a value
 *)
 let rec isval e = match e with 
-     Nat(_) -> true
-   | Bool(_) -> true
-   | _ -> raise AssignmentIncomplete (* COMPLETE ME *)
+| Function(_, _) -> true
+| Nat(_x) -> true
+| Bool(_) -> true
+| Fix(_, _, _) -> true
+| Pair(e1, e2) -> isval e1 && isval e2 
+| _ -> false ;;
 
 exception StuckExpr
 
