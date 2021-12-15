@@ -1,0 +1,3 @@
+[submodule "CS225-public"]
+	path = CS225-public
+	url = git@github.com:uvm-plaid/CS225-public.git
