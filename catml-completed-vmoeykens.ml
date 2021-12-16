@@ -135,7 +135,7 @@ let rec subst e1 e2 id = match e1 with
     | Fix(z, x, e3) -> if x = id then Fix(z, x, e3) else Fix(z, x, subst e3 e2 id)
     | Fst(e3) -> Fst(subst e3 e2 id)
     | Snd(e3) -> Snd(subst e3 e2 id)
-    | Pair(e3, e4) -> Pair(subst e3 e2 id, subst e3 e2 id) ;;
+    | Pair(e3, e4) -> Pair(subst e3 e2 id, subst e4 e2 id) ;;
 
 (*
    Value predicate
@@ -199,8 +199,13 @@ let rec redx e = match e with
    | If(Bool(false), e1, e2) -> e2
    | If(e1, e2, e3) -> If(redx e1, e2, e3)
    | Let(x, e1, e2) -> if isval e1 then subst e2 e1 x else Let(x, redx e1, e2)
-   | Fix(z, x, e1) -> Fix(z, x, e1) ;;
-
+   | Fix(z, x, e1) -> Fix(z, x, e1) 
+   | Pair(e1, e2) -> if isval (Pair(e1, e2)) then Pair(e1, e2) else (if isval e1 then Pair(e1, redx e2) else Pair(redx e1, e2))
+   | Fst(Pair(e1, e2)) -> if isval e1 && isval e2 then e1 else Fst(redx (Pair(e1, e2)))   
+   | Fst(e1) -> Fst(redx e1)
+   | Snd(Pair(e1, e2)) -> if isval e1 && isval e2 then e2 else Snd(redx (Pair(e1, e2)))   
+   | Snd(e1) -> Snd(redx e1) ;;
+   
 (*
    Multistep reduction
    -------------------
