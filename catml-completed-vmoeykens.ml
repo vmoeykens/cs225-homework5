@@ -93,7 +93,7 @@ let rec closed e ident_list = match e with
     | Let(i, e1, e2) -> closed e1 ident_list && closed e2 (i::ident_list)
     | Equal(left, right) -> closed left ident_list && closed right ident_list 
     | Or(left, right) -> closed left ident_list && closed right ident_list
-    | Var(var) -> not (List.mem var ident_list)
+    | Var(var) -> List.mem var ident_list
     | Function(x, e) -> closed e (x::ident_list)
     | Nat(x) -> true
     | Plus(left, right) -> closed left ident_list && closed right ident_list
@@ -199,7 +199,7 @@ let rec redx e = match e with
    | If(Bool(false), e1, e2) -> e2
    | If(e1, e2, e3) -> If(redx e1, e2, e3)
    | Let(x, e1, e2) -> if isval e1 then subst e2 e1 x else Let(x, redx e1, e2)
-   | Fix(z, x, e1) -> Fix(z, x, e1)
+   | Fix(z, x, e1) -> Fix(z, x, e1) ;;
 
 (*
    Multistep reduction
