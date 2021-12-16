@@ -189,7 +189,12 @@ let rec redx e = match e with
    | Equal(Nat(e1), Nat(e2)) -> Bool(e1 = e2)
    | Equal(Nat(e1), e2) -> Equal(Nat(e1), redx e2)
    | Equal(e1, e2) -> Equal(redx e1, e2)
-   | _ -> raise AssignmentIncomplete (* COMPLETE ME *)
+   | Bool(v) -> Bool(v)
+   | Function(x, e) -> Function(x, e)
+   | Appl(Function(x, e1), e2) -> if isval e2 then subst e1 e2 x else Appl(Function(x, e1), redx e2)
+   | Appl(Fix(z, x, e1), e2) ->  if isval e2 then subst (subst e1 (Fix(z, x, e1)) z) e2 x else Appl(Fix(z, x, e1), redx e2)
+   | Appl(e1, e2) -> if isval e1 then Appl(e1, redx e2) else Appl(redx e1, e2)
+   | Var(x) -> Var(x)
 
 (*
    Multistep reduction
