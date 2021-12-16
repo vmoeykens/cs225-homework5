@@ -190,11 +190,16 @@ let rec redx e = match e with
    | Equal(Nat(e1), e2) -> Equal(Nat(e1), redx e2)
    | Equal(e1, e2) -> Equal(redx e1, e2)
    | Bool(v) -> Bool(v)
-   | Function(x, e) -> Function(x, e)
+   | Function(x, e1) -> Function(x, e1)
    | Appl(Function(x, e1), e2) -> if isval e2 then subst e1 e2 x else Appl(Function(x, e1), redx e2)
    | Appl(Fix(z, x, e1), e2) ->  if isval e2 then subst (subst e1 (Fix(z, x, e1)) z) e2 x else Appl(Fix(z, x, e1), redx e2)
    | Appl(e1, e2) -> if isval e1 then Appl(e1, redx e2) else Appl(redx e1, e2)
    | Var(x) -> Var(x)
+   | If(Bool(true), e1, e2) -> e1
+   | If(Bool(false), e1, e2) -> e2
+   | If(e1, e2, e3) -> If(redx e1, e2, e3)
+   | Let(x, e1, e2) -> if isval e1 then subst e2 e1 x else Let(x, redx e1, e2)
+   | Fix(z, x, e1) -> Fix(z, x, e1)
 
 (*
    Multistep reduction
